@@ -1,10 +1,10 @@
 <template>
-  <td :style="{width: size.w + 'px', height: size.h + 'px'}" class="cell">
+  <td :class="{'mine-clear': cellData.isClear}" @click="cellClick" :style="{width: size.w + 'px', height: size.h + 'px'}" class="cell">
   <template v-if="cellData.isBoom">
-    BOOM
+    B
   </template>
   <template v-else>
-    {{cellData.data}}
+    <span v-if="cellData.data != 0">{{cellData.data}}</span>
   </template>
 
   </td>
@@ -15,6 +15,22 @@ export default {
   name: "cell",
   data() {
     return {};
+  },
+  methods: {
+    cellClick(e) {
+      // 点击的鼠标左键
+      if (e.button === 0) {
+        if (this.cellData.isBoom) {
+          // 发送 游戏结束的事件。
+          console.log("boom");
+        } else {
+          // 让当前的单元格：显示数字
+          // this.cellData.isClear = true;
+          this.$set(this.cellData, "isClear", true);
+          console.log("clear");
+        }
+      }
+    }
   },
   props: {
     cellData: {
@@ -36,4 +52,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+td {
+  text-align: center;
+  vertical-align: middle;
+}
+.mine-clear {
+  background-color: #333 !important;
+}
 </style>

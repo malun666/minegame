@@ -112,6 +112,12 @@ export default {
     },
     cellHeight(newVal) {
       this.isCellWHSync && (this.cellWidth = newVal);
+    },
+    rows() {
+      this.initCellData();
+    },
+    cols() {
+      this.initCellData();
     }
   },
   components: {
