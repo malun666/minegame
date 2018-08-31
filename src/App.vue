@@ -70,12 +70,23 @@ export default {
 
     for (let i = 0; i < sum; i++) {
       let isBoom = randomIndexSet.has(i);
-      this.cellArray.push({ isBoom, data: 0, isMarked: false, isClear: false }); // 建议使用这种
+      let data = this.getBoomsNum(i, randomIndexSet);
+      this.cellArray.push({ isBoom, data, isMarked: false, isClear: false }); // 建议使用这种
       // this.cellArray[i] = {};
       // this.$set(this.cellArray, i, {})  // 这种是可以被监控。
     }
   },
   methods: {
+    getBoomsNum(index, boomsSet) {
+      let count = 0; // 周围的总共炸弹数据
+      for (let i = -1; i <= 1; i++) {
+        let startIndex = index - i * this.cols - 1;
+        count += boomsSet.has(startIndex);
+        count += boomsSet.has(startIndex + 1);
+        count += boomsSet.has(startIndex + 2);
+      }
+      return count;
+    },
     getLevelNum() {
       if (this.level === "简单") {
         return 1;
