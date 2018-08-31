@@ -35,13 +35,22 @@
           <span class="demonstration">列高：{{cellHeight}}</span>
           <el-slider v-model="cellHeight" :min="5" ></el-slider>
         </div>
+        <div class="block">
+          <el-button @click="initCellData" type="warning">重置</el-button>
+        </div>
       </div>
     </div>
+    <play-sound src-sound="/a.mp3"></play-sound>
+    <timer></timer>
   </div>
 </template>
 
 <script>
 import Cell from "./components/Cell";
+import PlaySound from "./components/PlaySound";
+import Timer from "./components/Timer";
+import EventBus from "./eventBus.js";
+
 import "element-ui/lib/theme-chalk/index.css";
 
 export default {
@@ -55,7 +64,9 @@ export default {
       cellHeight: 30,
       isCellWHSync: true,
       // { isBoom: false, data: 2, isMarked: false, isClear: false}
-      cellArray: []
+      cellArray: [],
+      // 是否是重置状态
+      isReset: true
     };
   },
   created() {
@@ -63,6 +74,11 @@ export default {
     document.oncontextmenu = () => {
       return false;
     };
+
+    EventBus.$on("click-cell", () => {
+      this.isReset && EventBus.$emit("start-timer");
+      this.isReset = false;
+    });
   },
   methods: {
     // 清理雷区
@@ -104,6 +120,8 @@ export default {
     },
     // 初始化数组数据
     initCellData() {
+      // 设置当前重置状态
+      this.isReset = true;
       // 动态初始化一下：Cell数组，动态随机生成对应的地雷数据。
       let sum = this.cols * this.rows;
       // 计算一共需要随机设置多少个地雷
@@ -168,7 +186,9 @@ export default {
     }
   },
   components: {
-    cell: Cell
+    cell: Cell,
+    "play-sound": PlaySound,
+    timer: Timer
   }
 };
 </script>
