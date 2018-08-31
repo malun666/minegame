@@ -79,8 +79,22 @@ export default {
       this.isReset && EventBus.$emit("start-timer");
       this.isReset = false;
     });
+
+    EventBus.$on("boom-end", () => {
+      this.boomEnd();
+    });
   },
   methods: {
+    boomEnd() {
+      // 把所有的雷显示。另外就是把所有的非类 clear
+      this.cellArray.forEach(item => {
+        if (item.isBoom) {
+          this.$set(item, "isShowBoom", true);
+        } else {
+          this.$set(item, "isClear", true);
+        }
+      });
+    },
     // 清理雷区
     clearBoom(index) {
       const innerClearBoom = cIndex => {
@@ -139,6 +153,7 @@ export default {
         this.cellArray.push({
           isBoom,
           data,
+          isShowBoom: false,
           isMarked: false,
           isClear: false,
           cellIndex: i

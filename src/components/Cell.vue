@@ -1,5 +1,5 @@
 <template>
-  <td :class="{'mine-clear': cellData.isClear, 'marked': cellData.isMarked}" @mousedown="cellClick" :style="{width: size.w + 'px', height: size.h + 'px'}" class="cell">
+  <td :class="{'boom': cellData.isShowBoom, 'mine-clear': cellData.isClear, 'marked': cellData.isMarked}" @mousedown="cellClick" :style="{width: size.w + 'px', height: size.h + 'px'}" class="cell">
     <span :style="{color: getNumColor(cellData.data)}" v-if="cellData.data != 0 && cellData.isClear">{{cellData.data}}</span>
   </td>
 </template>
@@ -90,5 +90,18 @@ td {
 .marked {
   background-image: url(/flag.png) !important;
   background-size: cover;
+}
+.boom {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url(/bz.png) !important;
+    background-size: contain;
+  }
 }
 </style>
