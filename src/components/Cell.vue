@@ -26,8 +26,10 @@ export default {
         } else {
           // 让当前的单元格：显示数字
           // this.cellData.isClear = true;
-          this.$set(this.cellData, "isClear", true);
-          console.log("clear");
+          // this.$set(this.cellData, "isClear", true);
+          // console.log("clear");
+          // 把要清理的坐标index发送给父容器。
+          this.$emit("clearboom", this.cellData.cellIndex);
         }
       }
     }

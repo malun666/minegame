@@ -5,7 +5,7 @@
       <div class="main">
         <table class="mine-table">
           <tr v-for="(rowItem, rIndex) of rows" :key="'row_' + rIndex">
-            <cell :cell-data="cellArray[rIndex * cols + cIndex]" :size="{w: cellWidth, h: cellHeight}" v-for="(colItem, cIndex) of cols" :key="'col_' + cIndex"></cell>
+            <cell @clearboom="clearBoom" :cell-data="cellArray[rIndex * cols + cIndex]" :size="{w: cellWidth, h: cellHeight}" v-for="(colItem, cIndex) of cols" :key="'col_' + cIndex"></cell>
           </tr>
         </table>
       </div>
@@ -62,6 +62,40 @@ export default {
     this.initCellData();
   },
   methods: {
+    // 清理雷区
+    clearBoom(index) {
+      const innerClearBoom = cIndex => {
+        if (cIndex >= 0 && cIndex < this.cellArray.length) {
+          let cell = this.cellArray[cIndex];
+          if (cell.isMarked || cell.isBoom || cell.isClear) {
+            return;
+          }
+          this.$set(this.cellArray[cIndex], "isClear", true);
+          // 如果自己也是 0， 继续清理
+          this.clearBoom(cIndex);
+        }
+      };
+
+      // 如果当前自己不是0，那么就直接把自己清理掉。isCear true
+      let cell = this.cellArray[index];
+      if (cell.data !== 0) {
+        this.$set(cell, "isClear", true);
+        return;
+      }
+      // 如果是0， 那么周围的8个都要clear。
+      for (let i = -1; i <= 1; i++) {
+        // i -1  0  1
+        let startIndex = index - this.cols * i - 1;
+        if (index % this.cols > 0) {
+          innerClearBoom(startIndex); // index 10
+        }
+        innerClearBoom(startIndex + 1);
+        if (index % this.cols < this.cols - 1) {
+          innerClearBoom(startIndex + 2);
+        }
+      }
+      // 如果周围的元素也是0， 那么此元素的周围也要清理。
+    },
     changeLevel() {
       this.initCellData();
     },
@@ -81,7 +115,13 @@ export default {
       for (let i = 0; i < sum; i++) {
         let isBoom = randomIndexSet.has(i);
         let data = this.getBoomsNum(i, randomIndexSet);
-        this.cellArray.push({ isBoom, data, isMarked: false, isClear: false }); // 建议使用这种
+        this.cellArray.push({
+          isBoom,
+          data,
+          isMarked: false,
+          isClear: false,
+          cellIndex: i
+        }); // 建议使用这种
         // this.cellArray[i] = {};
         // this.$set(this.cellArray, i, {})  // 这种是可以被监控。
       }
@@ -90,9 +130,13 @@ export default {
       let count = 0; // 周围的总共炸弹数据
       for (let i = -1; i <= 1; i++) {
         let startIndex = index - i * this.cols - 1;
-        count += boomsSet.has(startIndex);
+        if (index % this.cols > 0) {
+          count += boomsSet.has(startIndex);
+        }
         count += boomsSet.has(startIndex + 1);
-        count += boomsSet.has(startIndex + 2);
+        if (index % this.cols < this.cols - 1) {
+          count += boomsSet.has(startIndex + 2);
+        }
       }
       return count;
     },
