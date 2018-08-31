@@ -10,7 +10,7 @@
         </table>
       </div>
       <div class="aside">
-        <el-radio-group v-model="level" size="mini">
+        <el-radio-group @change="changeLevel" v-model="level" size="mini">
           <el-radio-button label="简单"></el-radio-button>
           <el-radio-button label="中级"></el-radio-button>
           <el-radio-button label="高级"></el-radio-button>
@@ -59,24 +59,33 @@ export default {
     };
   },
   created() {
-    // 动态初始化一下：Cell数组，动态随机生成对应的地雷数据。
-    let sum = this.cols * this.rows;
-    // 计算一共需要随机设置多少个地雷
-    let randomBooms = this.getLevelNum() * 0.15 * sum;
-    let randomIndexSet = new Set(); // 它的元素不能重复。
-    while (randomIndexSet.size < randomBooms) {
-      randomIndexSet.add(Math.trunc(Math.random() * sum));
-    }
-
-    for (let i = 0; i < sum; i++) {
-      let isBoom = randomIndexSet.has(i);
-      let data = this.getBoomsNum(i, randomIndexSet);
-      this.cellArray.push({ isBoom, data, isMarked: false, isClear: false }); // 建议使用这种
-      // this.cellArray[i] = {};
-      // this.$set(this.cellArray, i, {})  // 这种是可以被监控。
-    }
+    this.initCellData();
   },
   methods: {
+    changeLevel() {
+      this.initCellData();
+    },
+    // 初始化数组数据
+    initCellData() {
+      // 动态初始化一下：Cell数组，动态随机生成对应的地雷数据。
+      let sum = this.cols * this.rows;
+      // 计算一共需要随机设置多少个地雷
+      let randomBooms = this.getLevelNum() * 0.15 * sum;
+      let randomIndexSet = new Set(); // 它的元素不能重复。
+      while (randomIndexSet.size < randomBooms) {
+        randomIndexSet.add(Math.trunc(Math.random() * sum));
+      }
+
+      this.cellArray = []; // 先进行清空数组中的元素。
+
+      for (let i = 0; i < sum; i++) {
+        let isBoom = randomIndexSet.has(i);
+        let data = this.getBoomsNum(i, randomIndexSet);
+        this.cellArray.push({ isBoom, data, isMarked: false, isClear: false }); // 建议使用这种
+        // this.cellArray[i] = {};
+        // this.$set(this.cellArray, i, {})  // 这种是可以被监控。
+      }
+    },
     getBoomsNum(index, boomsSet) {
       let count = 0; // 周围的总共炸弹数据
       for (let i = -1; i <= 1; i++) {
