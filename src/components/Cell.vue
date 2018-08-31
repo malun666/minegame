@@ -1,12 +1,11 @@
 <template>
-  <td :class="{'mine-clear': cellData.isClear}" @click="cellClick" :style="{width: size.w + 'px', height: size.h + 'px'}" class="cell">
+  <td :class="{'mine-clear': cellData.isClear, 'marked': cellData.isMarked}" @mousedown="cellClick" :style="{width: size.w + 'px', height: size.h + 'px'}" class="cell">
   <template v-if="cellData.isBoom">
     B
   </template>
   <template v-else>
     <span v-if="cellData.data != 0">{{cellData.data}}</span>
   </template>
-
   </td>
 </template>
 
@@ -18,12 +17,23 @@ export default {
   },
   methods: {
     cellClick(e) {
+      if (this.cellData.isClear) {
+        return; // 误操作直接结束
+      }
+      // 如果是点击了鼠标的邮件，标记为marked状态
+      if (e.button === 2) {
+        this.$set(this.cellData, "isMarked", !this.cellData.isMarked);
+        return;
+      }
       // 点击的鼠标左键
       if (e.button === 0) {
         if (this.cellData.isBoom) {
           // 发送 游戏结束的事件。
           console.log("boom");
         } else {
+          // 如果标志了小旗子
+          if (this.cellData.isMarked) return;
+
           // 让当前的单元格：显示数字
           // this.cellData.isClear = true;
           // this.$set(this.cellData, "isClear", true);
@@ -60,5 +70,9 @@ td {
 }
 .mine-clear {
   background-color: #333 !important;
+}
+.marked {
+  background-image: url(/flag.png) !important;
+  background-size: cover;
 }
 </style>

@@ -60,6 +60,9 @@ export default {
   },
   created() {
     this.initCellData();
+    document.oncontextmenu = () => {
+      return false;
+    };
   },
   methods: {
     // 清理雷区
