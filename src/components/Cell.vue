@@ -1,11 +1,6 @@
 <template>
   <td :class="{'mine-clear': cellData.isClear, 'marked': cellData.isMarked}" @mousedown="cellClick" :style="{width: size.w + 'px', height: size.h + 'px'}" class="cell">
-  <template v-if="cellData.isBoom">
-    B
-  </template>
-  <template v-else>
-    <span v-if="cellData.data != 0">{{cellData.data}}</span>
-  </template>
+    <span :style="{color: getNumColor(cellData.data)}" v-if="cellData.data != 0 && cellData.isClear">{{cellData.data}}</span>
   </td>
 </template>
 
@@ -16,6 +11,24 @@ export default {
     return {};
   },
   methods: {
+    getNumColor(num) {
+      switch (num) {
+        case 1:
+          return "#fff";
+        case 2:
+          return "#c6a";
+        case 3:
+          return "#08a";
+        case 4:
+          return "#0a2";
+        case 5:
+          return "#a20";
+        case 6:
+          return "#f30";
+        default:
+          return "#f90";
+      }
+    },
     cellClick(e) {
       if (this.cellData.isClear) {
         return; // 误操作直接结束
